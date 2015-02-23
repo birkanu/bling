@@ -4,11 +4,11 @@ var express = require('express'),
     io = require('socket.io')(http),
     noble = require('noble');
 
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', "http://"+req.headers.host+':8000');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html');
 });
+
+app.use(express.static(__dirname + '/public'));
 
 var server = http.listen(3000, function () {
   var host = server.address().address;
@@ -21,11 +21,9 @@ var rhynoConnectionUuid = '6e400001b5a3f393e0a9e50e24dcca9e',
     rhynoActionCharacteristicUuid = '6e400003b5a3f393e0a9e50e24dcca9e';
 
 var ioClientConnected = false;
-var socket;
 io.on('connection', function(socket){
   console.log('Connected to 2048 Client via Socket.io. \n');
   ioClientConnected = true;
-  socket = socket;
   socket.on('disconnect', function(){
     console.log('2048 Client disconnected. \n');
     ioClientConnected = false;
@@ -43,7 +41,7 @@ noble.on('stateChange', function(state) {
 });
 
 noble.on('discover', function(peripheral) {
-  console.log('Discovered peripheral: ' + peripheral.advertisement + '\n');
+  console.log('Discovered peripheral: ', peripheral.advertisement, '\n');
   if (peripheral.uuid === rhynoPeripheralUuid) {
     noble.stopScanning();
 
@@ -62,27 +60,27 @@ noble.on('discover', function(peripheral) {
               if (data.length === 1 && ioClientConnected) {
                 var result = data.readUInt8(0);
                 switch (result) {
-                  case 1:
+                  case 117:
                     console.log('Received Action from Rhyno: UP. \n');
                     io.emit('action', 'up');
                     break;
-                  case 2: 
+                  case 100: 
                     console.log('Received Action from Rhyno: DOWN. \n');
                     io.emit('action', 'down');
                     break;
-                  case 3: 
+                  case 108: 
                     console.log('Received Action from Rhyno: LEFT. \n');
                     io.emit('action', 'left');
                     break; 
-                  case 4:
+                  case 114:
                     console.log('Received Action from Rhyno: RIGHT. \n');
                     io.emit('action', 'right');
                     break;
-                  case 5:
+                  case 105:
                     console.log('Received Action from Rhyno: ZOOM IN. \n');
                     io.emit('action', 'zoom in');
                     break;
-                  case 6:
+                  case 111:
                     console.log('Received Action from Rhyno: ZOOM OUT. \n');
                     io.emit('action', 'zoom out');
                     break;
@@ -91,7 +89,7 @@ noble.on('discover', function(peripheral) {
                 }
               }
               else {
-                console.log('Data received from Rhyno has an incorrect length. \n');
+                console.log('Data received from Rhyno has an incorrect length \n');
               }
             });
             characteristic.notify(true, function(error) {
