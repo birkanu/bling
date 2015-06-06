@@ -43,7 +43,7 @@ noble.on('stateChange', function(state) {
 
 noble.on('discover', function(peripheral) {
   console.log('Discovered peripheral: ', peripheral.advertisement, '\n');
-  if (peripheral.uuid === rhynoPeripheralUuid) {
+  // if (peripheral.uuid === rhynoPeripheralUuid) {
     noble.stopScanning();
 
     peripheral.on('disconnect', function() {
@@ -61,36 +61,8 @@ noble.on('discover', function(peripheral) {
             characteristic.on('read', function(data, isNotification) {
               // if (data && ioClientConnected) {
               if (data) {
-                var result = data.readUInt8(0);
+                var result = data;//.readUInt8(0);
                 console.log("Data Received: " + result);
-                // switch (result) {
-                //   case 117:
-                //     console.log('Received Action from Rhyno: UP. \n');
-                //     io.emit('action', 'up');
-                //     break;
-                //   case 100: 
-                //     console.log('Received Action from Rhyno: DOWN. \n');
-                //     io.emit('action', 'down');
-                //     break;
-                //   case 108: 
-                //     console.log('Received Action from Rhyno: LEFT. \n');
-                //     io.emit('action', 'left');
-                //     break; 
-                //   case 114:
-                //     console.log('Received Action from Rhyno: RIGHT. \n');
-                //     io.emit('action', 'right');
-                //     break;
-                //   case 105:
-                //     console.log('Received Action from Rhyno: ZOOM IN. \n');
-                //     io.emit('action', 'zoom in');
-                //     break;
-                //   case 111:
-                //     console.log('Received Action from Rhyno: ZOOM OUT. \n');
-                //     io.emit('action', 'zoom out');
-                //     break;
-                //   default:
-                //     console.log('Data received from Rhyno is not a valid action. \n');
-                // }
               }
               else {
                 console.log('Data received from Rhyno has an incorrect length \n');
@@ -103,5 +75,5 @@ noble.on('discover', function(peripheral) {
         });
       });
     });
-  }
+  // }
 });
