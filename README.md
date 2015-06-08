@@ -4,6 +4,7 @@ Bling is a smart ring that lets you control any bluetooth enabled device using h
 
 This repository contains:
 * bling-js (Bling JavaScript bindings)
+* bling-arduino
 
 
 
