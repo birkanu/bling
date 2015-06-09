@@ -1,7 +1,7 @@
 {
-  "name": "rhyno",
+  "name": "bling-js",
   "version": "0.0.0",
-  "description": "Finger motion detector.",
+  "description": "Bling JavaScript bindings.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"

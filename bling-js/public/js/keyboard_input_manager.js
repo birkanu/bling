@@ -47,10 +47,10 @@ KeyboardInputManager.prototype.listen = function () {
     68:       1, // D
     83:       2, // S
     65:       3, // A
-    'up':     0, // Rhyno up
-    'right':  1, // Rhyno right
-    'down':   2, // Rhyno down
-    'left':   3  // Rhyno left
+    'up':     0, // Bling up
+    'right':  1, // Bling right
+    'down':   2, // Bling down
+    'left':   3  // Bling left
   };
 
   // Respond to direction keys
@@ -75,15 +75,15 @@ KeyboardInputManager.prototype.listen = function () {
   // Respond to Rhyno gestures
   socket.on('action', function (action) {
     if (action === 'zoom in') {
-      console.log("Received Action from Rhyno: " + action + ".");
+      console.log("Received Action from Bling: " + action + ".");
       zoom.to({
         element: document.querySelector('.game-container')
       });
     } else if (action === 'zoom out') {
-      console.log("Received Action from Rhyno: " + action + ".");
+      console.log("Received Action from Bling: " + action + ".");
       zoom.out();
     } else {
-      console.log("Received Action from Rhyno: " + action + ".");
+      console.log("Received Action from Bling: " + action + ".");
       var mapped = map[action];
       if (mapped !== undefined) {
         self.emit("move", mapped);

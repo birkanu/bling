@@ -16,9 +16,9 @@ var server = http.listen(3000, function () {
   console.log('\nApp listening at http://%s:%s. \n', host, port);
 });
 
-var rhynoConnectionUuid = '713d0000503e4c75ba943148f18d941e',
-    rhynoPeripheralUuid = '1810ed4ffa5e4c509e51705390a4217d',
-    rhynoActionCharacteristicUuid = '713d0002503e4c75ba943148f18d941e';
+var blingConnectionUuid = '713d0000503e4c75ba943148f18d941e',
+    blingPeripheralUuid = '1810ed4ffa5e4c509e51705390a4217d',
+    blingActionCharacteristicUuid = '713d0002503e4c75ba943148f18d941e';
 
 // var ioClientConnected = false;
 // io.on('connection', function(socket){
@@ -34,7 +34,7 @@ noble.on('stateChange', function(state) {
   if (state === 'poweredOn') {
     console.log('Started scanning for peripheral... \n');
     //noble.startScanning([], true);
-    noble.startScanning([rhynoConnectionUuid], false);
+    noble.startScanning([blingConnectionUuid], false);
   } else {
     console.log('Not scanning for peripheral... \n');
     noble.stopScanning();
@@ -43,20 +43,20 @@ noble.on('stateChange', function(state) {
 
 noble.on('discover', function(peripheral) {
   console.log('Discovered peripheral: ', peripheral.advertisement, '\n');
-  // if (peripheral.uuid === rhynoPeripheralUuid) {
+  // if (peripheral.uuid === blingPeripheralUuid) {
     noble.stopScanning();
 
     peripheral.on('disconnect', function() {
       process.exit(0);
       //noble.startScanning([], true);
-      noble.startScanning([rhynoConnectionUuid], false);
+      noble.startScanning([blingConnectionUuid], false);
     });
 
     peripheral.connect(function(err) {
       console.log('Connected to peripheral with uuid: ', peripheral.uuid, '\n');
       peripheral.discoverAllServicesAndCharacteristics(function(err, services, characteristics) {
         characteristics.forEach(function(characteristic) {
-          if (characteristic.uuid == rhynoActionCharacteristicUuid) {
+          if (characteristic.uuid == blingActionCharacteristicUuid) {
             console.log('Found Action Characteristic. \n');
             characteristic.on('read', function(data, isNotification) {
               // if (data && ioClientConnected) {
@@ -65,7 +65,7 @@ noble.on('discover', function(peripheral) {
                 console.log("Data Received: " + result);
               }
               else {
-                console.log('Data received from Rhyno has an incorrect length \n');
+                console.log('Data received from Bling has an incorrect length \n');
               }
             });
             characteristic.notify(true, function(error) {
