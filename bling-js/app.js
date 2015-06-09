@@ -61,8 +61,22 @@ noble.on('discover', function(peripheral) {
             characteristic.on('read', function(data, isNotification) {
               // if (data && ioClientConnected) {
               if (data) {
-                var result = data;//.readUInt8(0);
-                console.log("Data Received: " + result);
+                var resultAccX = data.readInt16BE(0);
+                var resultAccY = data.readInt16BE(2);
+                var resultAccZ = data.readInt16BE(4);
+                var resultTemp = data.readInt16BE(6);
+                var resultGyrX = data.readInt16BE(8);
+                var resultGyrY = data.readInt16BE(10);
+                var resultGyrZ = data.readInt16BE(12);
+                console.log("Acc_X Received: " + resultAccX/16324.0 + " G");
+                console.log("Acc_Y Received: " + resultAccY/16324.0 + " G");
+                console.log("Acc_Z Received: " + resultAccZ/16324.0 + " G");
+                console.log("Temp Received: " + resultTemp/340.0+36.53 + " Celcius");
+                console.log("Gyr_X Received: " + resultGyrX/131.0 + " DPS");
+                console.log("Gyr_Y Received: " + resultGyrY/131.0 + " DPS");
+                console.log("Gyr_Z Received: " + resultGyrZ/131.0 + " DPS");
+                console.log("----------------------------------------------");
+                console.log("----------------------------------------------");
               }
               else {
                 console.log('Data received from Bling has an incorrect length \n');
