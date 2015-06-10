@@ -1,7 +1,7 @@
 {
   "name": "bling-js",
   "version": "0.0.0",
-  "description": "Bling JavaScript bindings.",
+  "description": "Bling Connection: JavaScript Component.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
