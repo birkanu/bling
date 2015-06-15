@@ -38,14 +38,14 @@ var peripheralToJson = function (peripheral) {
 var actionDataToJson = function (data) {
   return {
     "acceleration": {
-      "x": data.readInt16BE(0) / 16324.0,
-      "y": data.readInt16BE(2) / 16324.0,
-      "z": data.readInt16BE(4) / 16324.0
+      "x": data.readInt16BE(0) / 8162.0,
+      "y": data.readInt16BE(2) / 8162.0,
+      "z": data.readInt16BE(4) / 8162.0
     }, 
     "gyroscope": {
-      "x": data.readInt16BE(8) / 131.0,
-      "y": data.readInt16BE(10) / 131.0,
-      "z": data.readInt16BE(12) / 131.0   
+      "x": data.readInt16BE(6) / 61.50,
+      "y": data.readInt16BE(8) / 61.50,
+      "z": data.readInt16BE(10) / 61.50   
     },
     "timestamp": Date.now()
   };
