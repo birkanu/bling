@@ -41,7 +41,7 @@
 #define    ACC_FULL_SCALE_16_G       0x18
 
 #define TXRX_BUF_LEN                      20
-#define UART_RX_TIME                      APP_TIMER_TICKS(1000, 0)
+#define UART_RX_TIME                      APP_TIMER_TICKS(10, 0)
 
 BLEDevice  ble;
 
@@ -85,6 +85,17 @@ void I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data)
     Data[index++]=Wire.read();
 }
 
+uint8_t readByte(uint8_t address, uint8_t subAddress)
+{
+	uint8_t data; // `data` will store the register data	 
+	Wire.beginTransmission(address);         // Initialize the Tx buffer
+	Wire.write(subAddress);	                 // Put slave register address in Tx buffer
+	Wire.endTransmission(false);             // Send the Tx buffer, but send a restart to keep connection alive
+	Wire.requestFrom(address, (uint8_t) 1);  // Read one byte from slave register address 
+	data = Wire.read();                      // Fill Rx buffer with result
+	return data;                             // Return data read from slave register
+}
+
 // Write a byte (Data) in device (Address) at register (Register)
 void I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data)
 {
@@ -96,37 +107,17 @@ void I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data)
 }
 
 void m_bling_action_handle(void * p_context)
-{   //update characteristic data
-//    uint8_t Buf[14];
-//    I2Cread(MPU9250_ADDRESS,0x3B,14,Buf);
-//    uint8_t ST1;
-//    do
-//    {
-//      I2Cread(MAG_ADDRESS,0x02,1,&ST1);
-//    }
-//    while (!(ST1&0x01));
-//    uint8_t Mag[6];
-//    I2Cread(MAG_ADDRESS,0x03,6,Mag);
-//    // Request next magnetometer single measurement
-//    I2CwriteByte(MAG_ADDRESS,0x0A,0x01);
-//    action_buf_num=0;
-//    int i;
-//    for(i=0;i<14;i++){
-//      action_buf[action_buf_num] = Buf[i];
-//      action_buf_num++;
-//    }
-//    for(i=14;i<20;i++){
-//      action_buf[action_buf_num] = Mag[i];
-//      action_buf_num++;
-//    }
+{   
     uint8_t Buf[14];
     I2Cread(MPU9250_ADDRESS,0x3B,14,Buf);
-    for(action_buf_num=0;action_buf_num<14;action_buf_num++){
+    for(action_buf_num=0;action_buf_num<6;action_buf_num++){
       action_buf[action_buf_num] = Buf[action_buf_num];
     }
-    //action_buf_num=(action_buf_num+1)%20;
-    //action_buf[action_buf_num] = action_buf_num+97;
-    ble.updateCharacteristicValue(actionCharacteristic.getHandle(), action_buf, action_buf_num);   
+    for(action_buf_num=6;action_buf_num<12;action_buf_num++){
+      action_buf[action_buf_num] = Buf[action_buf_num+2];
+    }
+    action_buf[19] = digitalRead(A3);
+    ble.updateCharacteristicValue(actionCharacteristic.getHandle(), action_buf, 20);//action_buf_num);   
     //memset(action_buf, 0x00,20);
     action_state = 0;
 }
@@ -183,16 +174,12 @@ void setup(void)
     delay(500);
     Wire.begin();
     Serial.begin(9600);
+    pinMode(A3, INPUT);
     
     //  // Configure gyroscope range
-    I2CwriteByte(MPU9250_ADDRESS,27,GYRO_FULL_SCALE_250_DPS);
+    I2CwriteByte(MPU9250_ADDRESS,27,GYRO_FULL_SCALE_500_DPS);
     //  // Configure accelerometers range
-    I2CwriteByte(MPU9250_ADDRESS,28,ACC_FULL_SCALE_2_G);
-    // Set by pass mode for the magnetometers
-    //I2CwriteByte(MPU9250_ADDRESS,0x37,0x02);
- 
-    // Request first magnetometer single measurement
-    //I2CwriteByte(MAG_ADDRESS,0x0A,0x01);
+    I2CwriteByte(MPU9250_ADDRESS,28,ACC_FULL_SCALE_4_G);
     
     Serial.irq_attach(actionCallBack);
     
