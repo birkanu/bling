@@ -4,7 +4,7 @@
   "description": "Bling JavaScript Bindings.",
   "main": "app.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node bling.js"
   },
   "author": "Birkan Uzun",
   "license": "ISC",
