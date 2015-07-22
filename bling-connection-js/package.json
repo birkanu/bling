@@ -9,11 +9,11 @@
   "author": "Birkan Uzun",
   "license": "ISC",
   "dependencies": {
-    "express": "~4.11.2",
-    "noble": "~0.3.9",
-    "hashmap": "~2.0.3",
-    "ws": "~0.7.2",
-    "async": "~1.3.0",
-    "socket.io": "~1.3.6"
+    "async": "^1.3.0",
+    "express": "^4.11.2",
+    "hashmap": "^2.0.3",
+    "noble": "^0.3.14",
+    "socket.io": "^1.3.6",
+    "ws": "^0.7.2"
   }
 }

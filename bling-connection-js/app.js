@@ -48,7 +48,7 @@ var discover = function (peripheral) {
     peripheral.id = disconnectedBlingsMap.get(peripheral.uuid);
     disconnectedBlingsMap.remove(peripheral.uuid);
   } else {
-    peripheral.id = blingCount - 1; 
+    peripheral.id = blingCount - 1;
   }
   console.log('Discovered bling:\n', peripheralToJson(peripheral), '\n');
   if (!peripheralMap.has(peripheral.id)) {
@@ -97,24 +97,25 @@ var connect = function (error) {
 };
 
 var discoverSomeServicesAndCharacteristics = function (error, services, characteristics) {
+  var peripheral = this;
   if (error) {
     throw error;
   } else {
     var blingActionChar;
     characteristics.forEach(function(characteristic) {
       if (characteristic.uuid == BLING_ACTION_CHAR_UUID) {
-        console.log('Found Action Characteristic for bling with id: ', this.id ,'. \n');
+        console.log('Found Action Characteristic for bling with id: ', peripheral.id ,'. \n');
         blingActionChar = characteristic;
       }
       blingActionChar.notify(true, function(error) {
-        console.log('Action Characteristic notifications for bling (id: ', this.id ,') are on.\n');
+        console.log('Action Characteristic notifications for bling (id: ', 	peripheral.id ,') are on.\n');
       });
       blingActionChar.on('read', function(data, isNotification) {
         if (data) {
           var actionData = actionDataToJson(data);
-          console.log("Data received from ", this.id, ":\n", actionData, "\n");
+          console.log("Data received from ", peripheral.id, ":\n", actionData, "\n");
           actionData.type = "imu";
-          actionData.bling = this.id;
+          actionData.bling = peripheral.id;
           blingClient.emit('message', JSON.stringify(actionData));
         }
       });
