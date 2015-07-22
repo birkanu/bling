@@ -11,8 +11,8 @@
 	// }
 
     var _ = require('underscore'),
-    	Socket = require('socket.io-client');
-    	EventTable = require('./src/EventTable'),
+    	Socket = require('socket.io-client'),
+    	EventTable = require('./src/EventTable').eventTable,
     	BlingInstance = require('./src/BlingInstance');
 
 	var handleMessage = function(msg) {
