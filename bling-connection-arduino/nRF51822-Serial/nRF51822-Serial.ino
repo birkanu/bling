@@ -41,7 +41,7 @@
 #define    ACC_FULL_SCALE_16_G       0x18
 
 #define TXRX_BUF_LEN                      20
-#define UART_RX_TIME                      APP_TIMER_TICKS(10, 0)
+#define UART_RX_TIME                      APP_TIMER_TICKS(1000, 0)
 
 BLEDevice  ble;
 

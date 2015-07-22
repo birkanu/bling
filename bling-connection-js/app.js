@@ -48,7 +48,7 @@ var discover = function (peripheral) {
     peripheral.id = disconnectedBlingsMap.get(peripheral.uuid);
     disconnectedBlingsMap.remove(peripheral.uuid);
   } else {
-    peripheral.id = blingCount - 1; 
+    peripheral.id = blingCount - 1;
   }
   console.log('Discovered bling:\n', peripheralToJson(peripheral), '\n');
   if (!peripheralMap.has(peripheral.id)) {
@@ -97,7 +97,7 @@ var connect = function (error) {
 };
 
 var discoverSomeServicesAndCharacteristics = function (error, services, characteristics) {
-  var peripheral = this
+  var peripheral = this;
   if (error) {
     throw error;
   } else {
