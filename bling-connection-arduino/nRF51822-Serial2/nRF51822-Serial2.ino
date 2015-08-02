@@ -196,7 +196,7 @@ enum Mscale {
 
 // Specify sensor full scale
 uint8_t Gscale = GFS_250DPS;
-uint8_t Ascale = AFS_2G;
+uint8_t Ascale = AFS_4G;
 uint8_t Mscale = MFS_16BITS; // Choose either 14-bit or 16-bit magnetometer resolution
 uint8_t Mmode = 0x06;        // 2 for 8 Hz, 6 for 100 Hz continuous magnetometer data read
 float aRes, gRes, mRes;      // scale resolutions per LSB for the sensors
@@ -256,7 +256,7 @@ float eInt[3] = {0.0f, 0.0f, 0.0f};       // vector to hold integral error for M
 #define    ACC_FULL_SCALE_16_G       0x18
 
 #define TXRX_BUF_LEN                      20
-#define UART_RX_TIME                      APP_TIMER_TICKS(1000, 0)
+#define UART_RX_TIME                      APP_TIMER_TICKS(100, 0)
 
 BLEDevice  ble;
 
@@ -395,16 +395,16 @@ void setup(void)
     
     delay(1000);
     MPU9250SelfTest(SelfTest); // Start by performing self test and reporting values
-    calibrateMPU9250(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers
+    //calibrateMPU9250(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers
     delay(1000); 
     initMPU9250(); 
     initAK8963(magCalibration);
     delay(1000);
     
     //  // CONFIGUREure gyroscope range
-    I2CwriteByte(MPU9250_ADDRESS,27,GYRO_FULL_SCALE_500_DPS);
+    //I2CwriteByte(MPU9250_ADDRESS,27,GYRO_FULL_SCALE_500_DPS);
     //  // CONFIGUREure accelerometers range
-    I2CwriteByte(MPU9250_ADDRESS,28,ACC_FULL_SCALE_4_G);
+    //I2CwriteByte(MPU9250_ADDRESS,28,ACC_FULL_SCALE_4_G);
     
     Serial.irq_attach(actionCallBack);
     
