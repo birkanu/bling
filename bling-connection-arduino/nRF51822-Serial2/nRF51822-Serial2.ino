@@ -196,7 +196,7 @@ enum Mscale {
 
 // Specify sensor full scale
 uint8_t Gscale = GFS_250DPS;
-uint8_t Ascale = AFS_4G;
+uint8_t Ascale = AFS_2G;
 uint8_t Mscale = MFS_16BITS; // Choose either 14-bit or 16-bit magnetometer resolution
 uint8_t Mmode = 0x06;        // 2 for 8 Hz, 6 for 100 Hz continuous magnetometer data read
 float aRes, gRes, mRes;      // scale resolutions per LSB for the sensors
@@ -256,7 +256,7 @@ float eInt[3] = {0.0f, 0.0f, 0.0f};       // vector to hold integral error for M
 #define    ACC_FULL_SCALE_16_G       0x18
 
 #define TXRX_BUF_LEN                      20
-#define UART_RX_TIME                      APP_TIMER_TICKS(100, 0)
+#define UART_RX_TIME                      APP_TIMER_TICKS(20, 0)
 
 BLEDevice  ble;
 
@@ -333,10 +333,30 @@ void m_bling_action_handle(void * p_context)
     }
     action_buf[19] = digitalRead(A3);
     ble.updateCharacteristicValue(actionCharacteristic.getHandle(), action_buf, 20);//action_buf_num);   
-    //memset(action_buf, 0x00,20);
     action_state = 0;
     
     yawPitchRoll();
+    if(yaw<0){
+      action_buf[12] = 255;
+    }
+    else{
+      action_buf[12] = 1;
+    }
+    action_buf[13] = (int) abs(yaw);
+    if(pitch<0){
+      action_buf[14] = 255;
+    }
+    else{
+      action_buf[14] = 1;
+    }
+    action_buf[15] = (int) abs(pitch);
+    if(roll<0){
+      action_buf[16] = 255;
+    }
+    else{
+      action_buf[16] = 1;
+    }
+    action_buf[17] = (int) abs(roll);
 }
 
 void actionCallBack(void)
@@ -357,11 +377,6 @@ void actionCallBack(void)
         //Serial.println(readByte);
         action_buf_num++;
     }
-//    int i;
-//    for(i=0;i<20;i++){
-//      action_buf[action_buf_num] = i+97;
-//      action_buf_num++;
-//    }
 }
 
 void disconnectionCallback(void)
@@ -395,16 +410,11 @@ void setup(void)
     
     delay(1000);
     MPU9250SelfTest(SelfTest); // Start by performing self test and reporting values
-    //calibrateMPU9250(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers
+    calibrateMPU9250(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers
     delay(1000); 
     initMPU9250(); 
     initAK8963(magCalibration);
     delay(1000);
-    
-    //  // CONFIGUREure gyroscope range
-    //I2CwriteByte(MPU9250_ADDRESS,27,GYRO_FULL_SCALE_500_DPS);
-    //  // CONFIGUREure accelerometers range
-    //I2CwriteByte(MPU9250_ADDRESS,28,ACC_FULL_SCALE_4_G);
     
     Serial.irq_attach(actionCallBack);
     
@@ -1004,9 +1014,9 @@ void yawPitchRoll()
   
     readMagData(magCount);  // Read the x/y/z adc values
     getMres();
-    //magbias[0] = +470.;  // User environmental x-axis correction in milliGauss, should be automatically calculated
-    //magbias[1] = +120.;  // User environmental x-axis correction in milliGauss
-    //magbias[2] = +125.;  // User environmental x-axis correction in milliGauss
+    magbias[0] = +470.;  // User environmental x-axis correction in milliGauss, should be automatically calculated
+    magbias[1] = +120.;  // User environmental x-axis correction in milliGauss
+    magbias[2] = +125.;  // User environmental x-axis correction in milliGauss
     
     // Calculate the magnetometer values in milliGauss
     // Include factory calibration per data sheet and user environmental corrections
@@ -1032,7 +1042,7 @@ void yawPitchRoll()
     roll  = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
     pitch *= 180.0f / PI;
     yaw   *= 180.0f / PI; 
-    yaw   -= 13.8; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
+    yaw   -= 0; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
     roll  *= 180.0f / PI;
     
     count = millis(); 
