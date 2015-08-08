@@ -2,7 +2,7 @@ var app = require('http').createServer(),
     io = require('socket.io')(app),
     noble = require('noble'),
     HashMap = require('hashmap'),
-    CommandTable = require('./src/EventTable');
+    CommandTable = require('./src/CommandTable');
 
 var BLING_UART_SERVICE_UUID = '713d0000503e4c75ba943148f18d941e'; // Custom Bling UART Service UUID
 var BLING_ACTION_CHAR_UUID = '713d0002503e4c75ba943148f18d941e'; // Custom Bling Action Characteristic UUID (Properties: Read, Notify)
