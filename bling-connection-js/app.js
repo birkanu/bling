@@ -1,10 +1,12 @@
 var app = require('http').createServer(),
-    io = require('socket.io')(app);
+    io = require('socket.io')(app),
     noble = require('noble'),
-    HashMap = require('hashmap');
+    HashMap = require('hashmap'),
+    CommandTable = requi`re('./src/EventTable');
 
 var BLING_UART_SERVICE_UUID = '713d0000503e4c75ba943148f18d941e'; // Custom Bling UART Service UUID
 var BLING_ACTION_CHAR_UUID = '713d0002503e4c75ba943148f18d941e'; // Custom Bling Action Characteristic UUID (Properties: Read, Notify)
+var BLING_COMMAND_CHAR_UUID = '713d0003503e4c75ba943148f18d941e'; // Custom Bling Command Characteristic UUID (Properties: Write)
 
 var peripheralMap = new HashMap(); // HashMap to store peripherals that are connected
 
@@ -40,6 +42,22 @@ var actionDataToJson = function (data) {
     },
     "timestamp": Date.now()
   };
+};
+
+// Handles the incoming commands from the Bling Client
+var handleMessage = function(msg) {
+  var data = JSON.parse(msg);
+    if (data.command == "connect") {
+      blingCount = data.bling_count;
+      noble.startScanning([BLING_UART_SERVICE_UUID], false);
+      console.log('Scanning for blings... \n');
+    } else {
+      if (peripheralMap.get(data.bling)) {
+        if (CommandTable[data.command]){
+          CommandTable[data.command](peripheralMap.get(data.bling), data);
+        }
+      }
+    }
 };
 
 // Starts connecting to a peripheral once it is discovered
@@ -102,11 +120,17 @@ var discoverSomeServicesAndCharacteristics = function (error, services, characte
     throw error;
   } else {
     var blingActionChar;
+    var blingCommandChar;
     characteristics.forEach(function(characteristic) {
       if (characteristic.uuid == BLING_ACTION_CHAR_UUID) {
         console.log('Found Action Characteristic for bling with id: ', peripheral.id ,'. \n');
         blingActionChar = characteristic;
-      }
+      } else if (characteristic.uuid == BLING_COMMAND_CHAR_UUID) {
+        console.log('Found Command Characteristic for bling with id: ', peripheral.id ,'. \n');
+        peripheral.commandChar = characteristic;
+        blingCommandChar = peripheral.commandChar;
+        peripheralMap.set(peripheral.id, peripheral);
+      }     
       blingActionChar.notify(true, function(error) {
         console.log('Action Characteristic notifications for bling (id: ', peripheral.id ,') are on.\n');
       });
@@ -123,37 +147,15 @@ var discoverSomeServicesAndCharacteristics = function (error, services, characte
   }
 };
 
-// noble.on('stateChange', function(state) {
-//   if (state === 'poweredOn') {
-//     // The BLE radio has been powered on. Begin scanning for peripherals
-//     // that provide the Custom Bling UART Service.
-//     console.log('Started scanning for peripherals... \n');
-//     noble.startScanning([BLING_UART_SERVICE_UUID], false);
-//   } else {
-//     console.log('BLE radio is not powered on. Not scanning for peripherals... \n');
-//     noble.stopScanning();
-//   }
-// });
-
 app.listen(3000);
 var wss = io.of('/bling');
 
 wss.on('connection', function(ws) {
   console.log('Successfully connected to Bling Client. \n');
   blingClient = ws;
-  blingClient.on('message', function(msg) {
-    var data = JSON.parse(msg)[1];
-    if (data.command == "connect") {
-      blingCount = data.bling_count;
-      noble.startScanning([BLING_UART_SERVICE_UUID], false);
-      // todo, add into handler
-      console.log('Scanning for blings... \n');
-    } else {
-      // TODO: Handle Commands
-      console.log(data);
-    }
-  });
+  blingClient.on('message', handleMessage);
   blingClient.on('close', function() {
+    // TODO: Decide what to do when Bling Client disconnects
     console.log('Bling Client disconnected. \n');
   });
 });

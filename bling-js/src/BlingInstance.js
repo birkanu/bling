@@ -13,10 +13,8 @@ var BlingInstance = module.exports = function(id, socket, options) {
 };
 
 /**
- *
  * Lock the given Bling immediately.
  * Can be called when a Bling is paired.
- *
  */
 BlingInstance.prototype.lock = function() {
     if (this.isLocked) return this;
@@ -29,10 +27,8 @@ BlingInstance.prototype.lock = function() {
 };
 
 /**
- *
  * Unlock the given Bling.
  * Can be called when a Bling is paired.
- *
  */
 BlingInstance.prototype.unlock = function(timeout) {
     var self = this;
@@ -60,10 +56,7 @@ BlingInstance.prototype.unlock = function(timeout) {
 };
 
 /**
- *
  * Engage the Bling's built in vibration motor.
- * @param intensity
- *
  */
 BlingInstance.prototype.vibrate = function(intensity) {
     intensity = intensity || 'medium';
@@ -79,10 +72,10 @@ BlingInstance.prototype.vibrate = function(intensity) {
  * Request the RSSI of the Bling.
  */
 BlingInstance.prototype.getRssi = function() {
-    this.socket.send(JSON.stringify(['command',{
-        "command": "request_rssi",
+    this.socket.send(JSON.stringify({
+        "command": "get_rssi",
         "bling": this.id
-    }]));
+    }));
     return this;
 };
 
