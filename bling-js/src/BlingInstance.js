@@ -18,7 +18,7 @@ var BlingInstance = module.exports = function(id, socket, options) {
  */
 BlingInstance.prototype.lock = function() {
     if (this.isLocked) return this;
-    this.socket.send(JSON.stringify({
+    this.socket.emit('message', JSON.stringify({
         "command": "lock",
         "bling": this.id
     }));
@@ -34,7 +34,7 @@ BlingInstance.prototype.unlock = function(timeout) {
     var self = this;
     clearTimeout(this.lockTimeout);
     if (timeout) {    
-        this.socket.send(JSON.stringify({
+        this.socket.emit('message', JSON.stringify({
             "command": "unlock",
             "bling": this.id,
             "type": "hold"
@@ -44,7 +44,7 @@ BlingInstance.prototype.unlock = function(timeout) {
             self.lock();
         }, timeout);
     } else {
-        this.socket.send(JSON.stringify({
+        this.socket.emit('message', JSON.stringify({
             "command": "unlock",
             "bling": this.id,
             "type": "timed"
@@ -60,7 +60,7 @@ BlingInstance.prototype.unlock = function(timeout) {
  */
 BlingInstance.prototype.vibrate = function(intensity) {
     intensity = intensity || 'medium';
-    this.socket.send(JSON.stringify({
+    this.socket.emit('message', JSON.stringify({
         "command": "vibrate",
         "bling": this.id,
         "type": intensity
@@ -72,7 +72,7 @@ BlingInstance.prototype.vibrate = function(intensity) {
  * Request the RSSI of the Bling.
  */
 BlingInstance.prototype.getRssi = function() {
-    this.socket.send(JSON.stringify({
+    this.socket.emit('message', JSON.stringify({
         "command": "get_rssi",
         "bling": this.id
     }));
