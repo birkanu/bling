@@ -52,17 +52,18 @@ var actionDataToJson = function (data) {
 // Handles the incoming commands from the Bling Client
 var handleMessage = function(msg) {
   var data = JSON.parse(msg);
-    if (data.command == "connect") {
-      blingCount = data.bling_count;
-      noble.startScanning([BLING_UART_SERVICE_UUID], false);
-      console.log('Scanning for blings... \n');
-    } else {
-      if (peripheralMap.get(data.bling)) {
-        if (CommandTable[data.command]){
-          CommandTable[data.command](peripheralMap.get(data.bling), data);
-        }
+  if (data.command == "connect") {
+    blingCount = data.bling_count;
+    noble.startScanning([BLING_UART_SERVICE_UUID], false);
+    // TODO: Make sure Bluetooth is on 
+    console.log('Scanning for blings... \n');
+  } else {
+    if (peripheralMap.get(data.bling)) {
+      if (CommandTable[data.command]){
+        CommandTable[data.command](peripheralMap.get(data.bling), data);
       }
     }
+  }
 };
 
 // Starts connecting to a peripheral once it is discovered
@@ -113,7 +114,7 @@ var connect = function (error) {
     });
     this.discoverSomeServicesAndCharacteristics(
       [BLING_UART_SERVICE_UUID], 
-      [BLING_ACTION_CHAR_UUID], 
+      [BLING_ACTION_CHAR_UUID, BLING_COMMAND_CHAR_UUID], 
       discoverSomeServicesAndCharacteristics.bind(this)
     );
   }
