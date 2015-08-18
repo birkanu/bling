@@ -14,6 +14,8 @@ var blingClient;
 var blingCount = 0;
 var disconnectedBlingsMap = new HashMap(); // HashMap to store the ids of the peripherals that are disconnected
 
+var isBluetoothPoweredOn = false;
+
 // Represents a peripheral in JSON format
 var peripheralToJson = function (peripheral) {
   return {
@@ -53,10 +55,13 @@ var actionDataToJson = function (data) {
 var handleMessage = function(msg) {
   var data = JSON.parse(msg);
   if (data.command == "connect") {
-    blingCount = data.bling_count;
-    noble.startScanning([BLING_UART_SERVICE_UUID], false);
-    // TODO: Make sure Bluetooth is on 
-    console.log('Scanning for blings... \n');
+    if (isBluetoothPoweredOn) {
+      blingCount = data.bling_count;
+      noble.startScanning([BLING_UART_SERVICE_UUID], false);
+      console.log('Scanning for blings... \n');
+    } else {
+      console.log('Bluetooth of your device is not powered on! Not scanning for blings...')
+    }
   } else {
     if (peripheralMap.get(data.bling)) {
       if (CommandTable[data.command]){
@@ -126,7 +131,7 @@ var discoverSomeServicesAndCharacteristics = function (error, services, characte
     throw error;
   } else {
     var blingActionChar;
-    var blingCommandChar;
+    //var blingCommandChar;
     characteristics.forEach(function(characteristic) {
       if (characteristic.uuid == BLING_ACTION_CHAR_UUID) {
         console.log('Found Action Characteristic for bling with id: ', peripheral.id ,'. \n');
@@ -134,7 +139,7 @@ var discoverSomeServicesAndCharacteristics = function (error, services, characte
       } else if (characteristic.uuid == BLING_COMMAND_CHAR_UUID) {
         console.log('Found Command Characteristic for bling with id: ', peripheral.id ,'. \n');
         peripheral.commandChar = characteristic;
-        blingCommandChar = peripheral.commandChar;
+        //blingCommandChar = peripheral.commandChar;
         peripheralMap.set(peripheral.id, peripheral);
       }     
       blingActionChar.notify(true, function(error) {
@@ -164,6 +169,14 @@ wss.on('connection', function(ws) {
     // TODO: Decide what to do when Bling Client disconnects
     console.log('Bling Client disconnected. \n');
   });
+});
+
+noble.on('stateChange', function(state) {
+  if (state === 'poweredOn') {
+    isBluetoothPoweredOn = true;
+  } else {
+    isBluetoothPoweredOn = false;
+  }
 });
 
 noble.on('discover', discover);
