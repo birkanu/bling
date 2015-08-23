@@ -136,24 +136,24 @@ var discoverSomeServicesAndCharacteristics = function (error, services, characte
       if (characteristic.uuid == BLING_ACTION_CHAR_UUID) {
         console.log('Found Action Characteristic for bling with id: ', peripheral.id ,'. \n');
         blingActionChar = characteristic;
+        blingActionChar.notify(true, function(error) {
+          console.log('Action Characteristic notifications for bling (id: ', peripheral.id ,') are on.\n');
+        });
+        blingActionChar.on('read', function(data, isNotification) {
+          if (data) {
+            var actionData = actionDataToJson(data);
+            console.log("Data received from ", peripheral.id, ":\n", actionData, "\n");
+            actionData.type = "imu";
+            actionData.bling = peripheral.id;
+            blingClient.emit('message', JSON.stringify(actionData));
+          }
+        });
       } else if (characteristic.uuid == BLING_COMMAND_CHAR_UUID) {
         console.log('Found Command Characteristic for bling with id: ', peripheral.id ,'. \n');
         peripheral.commandChar = characteristic;
         //blingCommandChar = peripheral.commandChar;
         peripheralMap.set(peripheral.id, peripheral);
       }     
-      blingActionChar.notify(true, function(error) {
-        console.log('Action Characteristic notifications for bling (id: ', peripheral.id ,') are on.\n');
-      });
-      blingActionChar.on('read', function(data, isNotification) {
-        if (data) {
-          var actionData = actionDataToJson(data);
-          console.log("Data received from ", peripheral.id, ":\n", actionData, "\n");
-          actionData.type = "imu";
-          actionData.bling = peripheral.id;
-          blingClient.emit('message', JSON.stringify(actionData));
-        }
-      });
     });
   }
 };
