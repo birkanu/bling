@@ -92,11 +92,6 @@ var connect = function (error) {
   } else {
     console.log('Connected to bling with id: ', this.id, '. \n');
     peripheralMap.set(this.id, this);
-    blingClient.emit('message', JSON.stringify({
-      "type": "connected",
-      "bling": this.id,
-      "timestamp": Date.now()
-    }));
     // If the maximum peripheral count to be connected is exceeded, stop scanning
     if (peripheralMap.count() >= blingCount) {
       console.log("Stopped scanning: Already connected to the requested amount of blings.");
@@ -155,6 +150,11 @@ var discoverSomeServicesAndCharacteristics = function (error, services, characte
         peripheralMap.set(peripheral.id, peripheral);
       }     
     });
+    blingClient.emit('message', JSON.stringify({
+      "type": "connected",
+      "bling": this.id,
+      "timestamp": Date.now()
+    }));
   }
 };
 
